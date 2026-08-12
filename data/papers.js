@@ -65,6 +65,17 @@ export const papers = [
   makePaper({ number: 21, sourceUrl: "https://drive.google.com/file/d/1zrrisAycPZnkivf9L1uxMuzXoQk1Oc5b/view", answers: [4, 1, 2, 2], contents: phy21 }),
 ];
 
+function escapeHtml(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;");
+}
+
+function textCardDataUri(content) {
+  const height = Math.max(620, Math.ceil(content.length / 64) * 37 + 130);
+  const safe = escapeHtml(content);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="${height}" viewBox="0 0 1100 ${height}"><rect width="100%" height="100%" fill="#ffffff"/><foreignObject x="0" y="0" width="1100" height="${height}"><div xmlns="http://www.w3.org/1999/xhtml" style="box-sizing:border-box;padding:42px 48px;color:#12223f;background:#fff;font-family:Arial,sans-serif;font-size:22px;line-height:1.55;white-space:pre-wrap">${safe}</div></foreignObject></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
 export function flattenPapers(selectedPapers = papers) {
   return selectedPapers.flatMap((paper) =>
     paper.questions.map((question) => ({
@@ -72,7 +83,7 @@ export function flattenPapers(selectedPapers = papers) {
       paperNumber: paper.number,
       paperTitle: paper.title,
       sourceUrl: paper.sourceUrl,
-      imageUrl: question.image ? `${paper.assetBase || ""}${question.image}` : null,
+      imageUrl: question.content ? textCardDataUri(question.content) : `${paper.assetBase || ""}${question.image}`,
     }))
   );
 }
