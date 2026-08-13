@@ -10,7 +10,6 @@ const nextConfig = {
   assetPrefix: basePath || undefined,
   images: { unoptimized: true },
   env: {
-    NEXT_PUBLIC_LEGACY_ASSET_BASE: "https://ict-day-papers-quiz-fkwfcoa1p-nimesha.vercel.app",
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
 };
