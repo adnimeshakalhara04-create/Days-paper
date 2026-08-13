@@ -44,7 +44,7 @@ const phy21 = [
 export const papers = [
   makePaper({ number: 1, sourceUrl: "https://drive.google.com/file/d/1QFSUHQjLhZOR5pUXEpvJGwptOohHAtB8/view", answers: [2, 3, 2, 4, 2, 2, 5] }),
   makePaper({ number: 2, sourceUrl: "https://drive.google.com/file/d/1f5jmWmdOjTG4DUHI0f5bodRfgK_4upfl/view", answers: [2, 2, 2, 3, 3, 2] }),
-  makePaper({ number: 3, sourceUrl: "https://drive.google.com/file/d/1MVVA9YFbdflPqYTn3uTtRzd-YQu7Uu2b/view", answers: [4, 3, 3, 2, 4, 3, 3] }),
+  makePaper({ number: 3, sourceUrl: "https://drive.google.com/file/d/1MVVA9YFbdflPqYTn3uTtRzd-YQu7Uu2b/view", answers: [4, 3, 3, 4, 2, 3, 3] }),
   makePaper({ number: 4, sourceUrl: "https://drive.google.com/file/d/1W4Yi7CqR07_y4O8eGsIWoygU3ii0I4ri/view", answers: [4, 3, 3, 3, 3, 5, 1] }),
   makePaper({ number: 5, sourceUrl: "https://drive.google.com/file/d/1_g4ARNidNM3lwbClPwyj3WOe19ht5K3T/view", answers: [4, 2, 3, 2, 4, 3] }),
   makePaper({ number: 6, sourceUrl: "https://drive.google.com/file/d/126PJZSDgG9i8wLqli6QNdpF5DX-yVCyH/view", answers: [3, 3, 2, 2, 2] }),
