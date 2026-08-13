@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -32,11 +32,70 @@ jobs:
         with:
           enablement: true
 
+      - name: Import local question crops
+        shell: bash
+        run: |
+          set -euo pipefail
+          counts=(7 6 7 7 6 5 5 5 6 6 4 6 6 6 7 7 8 8 4 6 4)
+          bases=(
+            "https://ict-day-papers-quiz.vercel.app"
+            "https://ict-day-papers-quiz-fkwfcoa1p-nimesha.vercel.app"
+          )
+
+          for paper in $(seq 1 21); do
+            paper_pad=$(printf "%02d" "$paper")
+            question_count=${counts[$((paper - 1))]}
+            mkdir -p "public/questions/phy-${paper_pad}"
+
+            for question in $(seq 1 "$question_count"); do
+              question_pad=$(printf "%02d" "$question")
+              target="public/questions/phy-${paper_pad}/q-${question_pad}.webp"
+              if [[ -s "$target" ]]; then
+                continue
+              fi
+
+              downloaded=false
+              for base in "${bases[@]}"; do
+                url="${base}/questions/phy-${paper_pad}/q-${question_pad}.webp"
+                if curl --fail --location --silent --show-error --retry 3 --retry-delay 2 "$url" --output "$target"; then
+                  downloaded=true
+                  break
+                fi
+              done
+
+              if [[ "$downloaded" != true || ! -s "$target" ]]; then
+                echo "Missing question crop: PHY ${paper_pad} Q${question_pad}" >&2
+                exit 1
+              fi
+            done
+          done
+
+          actual=$(find public/questions -type f -name 'q-*.webp' | wc -l | tr -d ' ')
+          if [[ "$actual" != "126" ]]; then
+            echo "Expected 126 question crops, found $actual" >&2
+            exit 1
+          fi
+          echo "Verified 126 local question crops."
+
       - name: Install dependencies
         run: npm ci
 
       - name: Build static site
         run: npm run build
+
+      - name: Persist imported question crops
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git status --porcelain -- public/questions | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/questions
+            git commit -m "Import PHY 01-21 question crops [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "Question crops already stored in repository."
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
