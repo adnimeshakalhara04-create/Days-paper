@@ -1,3 +1,25 @@
+import phy01 from "./marking/phy01";
+import phy02 from "./marking/phy02";
+import phy03 from "./marking/phy03";
+import phy04 from "./marking/phy04";
+import phy05 from "./marking/phy05";
+import phy06 from "./marking/phy06";
+import phy07 from "./marking/phy07";
+import phy08 from "./marking/phy08";
+import phy09 from "./marking/phy09";
+import phy10 from "./marking/phy10";
+import phy11 from "./marking/phy11";
+import phy12 from "./marking/phy12";
+import phy13 from "./marking/phy13";
+import phy14 from "./marking/phy14";
+import phy15 from "./marking/phy15";
+import phy16 from "./marking/phy16";
+import phy17 from "./marking/phy17";
+import phy18 from "./marking/phy18";
+import phy19 from "./marking/phy19";
+import phy20 from "./marking/phy20";
+import phy21 from "./marking/phy21";
+
 const markingIds = {
   1: "125t1Y0eM69Zg0vO-XsxTzq1vpUfQwp-k",
   2: "1hz-I6HiRHzTbgEq0WyVaKDSiUvhmI0VG",
@@ -20,6 +42,30 @@ const markingIds = {
   19: "11hHGgiS1OWuhBvnKOk09toRAgzmr8Nl3",
   20: "1SzaL4v7nFXp_LMW52wv9YWRzeG_aIkfD",
   21: "1y-Eqs1nMpDs96vBlFGNjPlSyNCwfi63J",
+};
+
+const markingByPaper = {
+  1: phy01,
+  2: phy02,
+  3: phy03,
+  4: phy04,
+  5: phy05,
+  6: phy06,
+  7: phy07,
+  8: phy08,
+  9: phy09,
+  10: phy10,
+  11: phy11,
+  12: phy12,
+  13: phy13,
+  14: phy14,
+  15: phy15,
+  16: phy16,
+  17: phy17,
+  18: phy18,
+  19: phy19,
+  20: phy20,
+  21: phy21,
 };
 
 const officialAnswers = {
@@ -46,19 +92,35 @@ const officialAnswers = {
   21: [4, 1, 2, 2],
 };
 
+function normalizeExplanations(entry, answer) {
+  const source = entry?.explanations ?? entry?.optionExplanations ?? [];
+  const fallback = entry?.markingExplanation || "Refer to the official marking explanation shown below.";
+  return [1, 2, 3, 4, 5].map((choice) => {
+    const exact = source[choice - 1];
+    if (typeof exact === "string" && exact.trim()) return exact.trim();
+    return `${choice === answer ? "Correct" : "Incorrect"} — ${fallback}`;
+  });
+}
+
 export function getOfficialMarking(paperNumber, questionNumber) {
   const id = markingIds[paperNumber];
-  const answer = officialAnswers[paperNumber]?.[questionNumber - 1];
+  const entry = markingByPaper[paperNumber]?.[questionNumber - 1];
+  const answer = entry?.answer ?? officialAnswers[paperNumber]?.[questionNumber - 1];
+  const explanations = normalizeExplanations(entry, answer);
+
   return {
     answer,
+    explanations,
     previewUrl: id ? `https://drive.google.com/file/d/${id}/preview#page=${questionNumber}` : "",
     openUrl: id ? `https://drive.google.com/file/d/${id}/view` : "",
   };
 }
 
-export function choiceReason(choice, correctAnswer) {
+export function choiceReason(choice, correctAnswer, explanations) {
+  const exact = explanations?.[choice - 1];
+  if (exact) return exact;
   if (choice === correctAnswer) {
-    return "Correct - this option matches the official marking scheme. The marking explanation below shows the exact reasoning used for this question.";
+    return "Correct — this option matches the official marking scheme.";
   }
-  return `Incorrect - the official marking scheme gives option ${correctAnswer} as the correct answer. Compare option ${choice} with the official explanation below to see the exact statement, rule, or component that makes it invalid.`;
+  return `Incorrect — the official marking scheme gives option ${correctAnswer} as the correct answer.`;
 }
